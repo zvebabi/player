@@ -19,8 +19,10 @@ win32 {
 }
 
 SOURCES += main.cpp\
-        mainwindow.cpp
+        mainwindow.cpp \
+    slicer.cpp
 
-HEADERS  += mainwindow.h
+HEADERS  += mainwindow.h \
+    slicer.h
 
 FORMS    += mainwindow.ui
