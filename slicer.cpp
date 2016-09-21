@@ -10,12 +10,4 @@ Slicer::~Slicer()
 
 }
 
-/*
- * slice video to frame and send to circular buffer
- */
-void Slicer::process() {
-    qDebug("Hello word!");
-    emit finished();
-}
-
 

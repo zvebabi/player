@@ -8,6 +8,7 @@ QT       += core gui
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
+CONFIG += c++11
 TARGET = player
 TEMPLATE = app
 
@@ -23,6 +24,7 @@ SOURCES += main.cpp\
     slicer.cpp
 
 HEADERS  += mainwindow.h \
-    slicer.h
+    slicer.h \
+    ringbuffer.h
 
 FORMS    += mainwindow.ui

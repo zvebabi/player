@@ -2,6 +2,7 @@
 #define SLICER_H
 
 #include <QObject>
+#include <QImage>
 #include <opencv2/opencv.hpp>
 
 class Slicer : public QObject
@@ -20,8 +21,8 @@ signals:
     void finished();//end of thread, when video is end
     void error(QString err);
 public slots:
-    void loadVideo(QString path);
-    void process(); //slice video to frame and send to circular buffer
+   // void loadVideo(QString path);
+   // void process(); //slice video to frame and send to circular buffer
 
 };
 
