@@ -5,16 +5,21 @@ MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
-    myPlayer = new Slicer(BUFFER_SIZE);
-    QObject::connect(myPlayer, SIGNAL(processedImage(QImage&)),
-                              this, SLOT(updatePlayerUI(QImage&)));
+    bufferOuter = new RingBuffer<QImage>(BUFFER_SIZE);
+    bufferInner = new RingBuffer<QImage>(BUFFER_SIZE);
+    SlicerOuter = new Slicer(*bufferOuter);
+    SlicerInner = new Slicer(*bufferInner);
+    myPlayer = new VideoPlayer(*bufferOuter, *bufferInner);
+
+    QObject::connect(myPlayer, SIGNAL(processedImage(QImage)),
+                                  this, SLOT(updatePlayerUI(QImage)));
     ui->setupUi(this);
 }
 
 MainWindow::~MainWindow()
 {
     delete ui;
-    delete myPlayer;
+    delete SlicerOuter;
 }
 
 void MainWindow::updatePlayerUI(QImage& img)

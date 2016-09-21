@@ -1,16 +1,15 @@
 #include "slicer.h"
 
-Slicer::Slicer(int sizeOfBuffer)
+Slicer::Slicer(RingBuffer<QImage> &buf)
 {
     f_stop = true;
-    buffer = new RingBuffer<QImage>(sizeOfBuffer);
+    *buffer = buf;
 }
 
 Slicer::~Slicer()
 {
     capture->release();
     delete capture;
-    delete buffer;
     delete img;
 }
 
@@ -18,7 +17,6 @@ void Slicer::bufferingFrame(const QImage &img)
 {
     qDebug() << "bufferingFrame";
     buffer->insertElement(img);
-    emit processedImage(img);
 }
 
 void Slicer::stop()
@@ -40,7 +38,7 @@ void Slicer::loadVideo(std::string path)
 
 void Slicer::process()
 {
-    qDebug() << "process..";
+    qDebug() << "buf_process..";
     while(!f_stop){
         if (!capture->read(frame))
         {
@@ -59,6 +57,7 @@ void Slicer::process()
         bufferingFrame(*img);
 
     }
+    emit finished();
 }
 
 

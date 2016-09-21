@@ -6,6 +6,8 @@
 #include <QMainWindow>
 #include <QFileDialog>
 #include <QMessageBox>
+#include <ringbuffer.h>
+#include <videoplayer.h>
 #include <slicer.h>
 
 namespace Ui {
@@ -23,7 +25,11 @@ private slots:
     void updatePlayerUI(QImage &img);
 private:
     Ui::MainWindow *ui;
-    Slicer *myPlayer;
+    RingBuffer<QImage> *bufferOuter;
+    RingBuffer<QImage> *bufferInner;
+    Slicer *SlicerOuter;
+    Slicer *SlicerInner;
+    VideoPlayer *myPlayer;
 };
 
 #endif // MAINWINDOW_H

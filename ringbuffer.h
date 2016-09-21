@@ -19,7 +19,7 @@ public:
     explicit RingBuffer(int sz);
     ~RingBuffer();
     bool insertElement(const T &newElem);
-    T popElement(T elem);
+    T& popElement(T &elem);
 
 };
 
@@ -53,10 +53,10 @@ bool RingBuffer<T>::insertElement(const T &newElem)
 }
 
 template <typename T>
-T RingBuffer<T>::popElement(T elem)
+T& RingBuffer<T>::popElement(T &elem)
 {
     if (currentElement == -1) {
-        return nullptr;
+        return QImage::QImage();
     }
     --currentElement;
     elem = buffer->front();
