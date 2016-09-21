@@ -3,26 +3,36 @@
 
 #include <QObject>
 #include <QImage>
+#include <QMutex>
+#include <string>
 #include <opencv2/opencv.hpp>
+#include <opencv2/video.hpp>
+#include <ringbuffer.h>
 
 class Slicer : public QObject
 {   Q_OBJECT
-    cv::VideoCapture capture;
+    bool f_stop;
+    bool f_loadSuccessful;
+    QMutex mutex;
+    cv::VideoCapture *capture;
     int frameRate;
-    QImage img;
+    QImage *img;
     cv::Mat frame;
     cv::Mat RGBframe;
+    RingBuffer<QImage>* buffer;
 
 public:
-    Slicer();
+    explicit Slicer(int sizeOfBuffer);
     virtual ~Slicer();
+    void bufferingFrame(const QImage &img);
 signals:
-    void bufferingFrame(const QImage &img); //emit to circular buffer
     void finished();//end of thread, when video is end
     void error(QString err);
+    void processedImage(const QImage &img);
 public slots:
-   // void loadVideo(QString path);
-   // void process(); //slice video to frame and send to circular buffer
+    void stop();
+    void loadVideo(std::string path);
+    void process(); //slice video to frame and send to circular buffer
 
 };
 

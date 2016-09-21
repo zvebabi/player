@@ -6,6 +6,7 @@
  */
 
 #include <QObject>
+#include <QDebug>
 #include <deque>
 
 template <typename T>
@@ -17,7 +18,7 @@ class RingBuffer
 public:
     explicit RingBuffer(int sz);
     ~RingBuffer();
-    bool insertElement(T &newElem);
+    bool insertElement(const T &newElem);
     T popElement(T elem);
 
 };
@@ -34,16 +35,13 @@ RingBuffer<T>::RingBuffer(int sz)
 template <typename T>
 RingBuffer<T>::~RingBuffer()
 {
-    for (auto it = buffer->begin(); it != buffer->end(); ++it){
-        delete *it;
-    }
     buffer->clear();
     qDebug() << "deleted";
     delete buffer;
 }
 
 template <typename T>
-bool RingBuffer<T>::insertElement(T &newElem)
+bool RingBuffer<T>::insertElement(const T &newElem)
 {
     if (currentElement==size-1){ //full buffer
         return false;
