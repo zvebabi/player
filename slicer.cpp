@@ -1,9 +1,9 @@
 #include "slicer.h"
 
-Slicer::Slicer(RingBuffer<QImage> &buf)
+Slicer::Slicer(RingBuffer<QImage>* buf)
 {
     f_stop = true;
-    *buffer = buf;
+    buffer = buf;
 }
 
 Slicer::~Slicer()
@@ -13,20 +13,19 @@ Slicer::~Slicer()
     delete img;
 }
 
-void Slicer::bufferingFrame(const QImage &img)
+bool Slicer::isVideoLoaded()
 {
-    qDebug() << "bufferingFrame";
-    buffer->insertElement(img);
+    return f_loadSuccessful;
 }
 
-void Slicer::stop()
+void Slicer::setStop(bool value)
 {
-    f_stop = true;
+    f_stop = value;
 }
 
-void Slicer::loadVideo(std::string path)
+void Slicer::loadVideo(QString path)
 {
-    capture->open(path);
+    capture = new cv::VideoCapture(path.toUtf8().data());
     if (capture->isOpened()) {
         frameRate = (int)capture->get(CV_CAP_PROP_FPS);
         f_loadSuccessful = true;
@@ -39,23 +38,33 @@ void Slicer::loadVideo(std::string path)
 void Slicer::process()
 {
     qDebug() << "buf_process..";
+    bool notFull = true; //flag for overloaded buffer
     while(!f_stop){
-        if (!capture->read(frame))
+        if (notFull)
         {
-            f_stop = true;
-        }
-        if (frame.channels()== 3){
-            cv::cvtColor(frame, RGBframe, CV_BGR2RGB);
-            img = new QImage((const unsigned char*)(RGBframe.data),
-                              RGBframe.cols,RGBframe.rows,QImage::Format_RGB888);
+            if (!capture->read(frame))
+            {
+                f_stop = true;
+            }
+            if (frame.channels()== 3){
+                cv::cvtColor(frame, RGBframe, CV_BGR2RGB);
+                img = new QImage((const unsigned char*)(RGBframe.data),
+                                  RGBframe.cols,RGBframe.rows,QImage::Format_RGB888);
+            }
+            else
+            {
+                img = new QImage((const unsigned char*)(frame.data),
+                                     frame.cols,frame.rows,QImage::Format_Indexed8);
+            }
+            qDebug() << "bufferingFrame";
+            notFull = buffer->insertElement(*img);
         }
         else
         {
-            img = new QImage((const unsigned char*)(frame.data),
-                                 frame.cols,frame.rows,QImage::Format_Indexed8);
+            qDebug() << "buffer_full";
+            QThread::msleep(500);
+            notFull = buffer->insertElement(*img);
         }
-        bufferingFrame(*img);
-
     }
     emit finished();
 }

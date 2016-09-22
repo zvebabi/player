@@ -1,21 +1,20 @@
 #include "videoplayer.h"
 
-VideoPlayer::VideoPlayer(RingBuffer<QImage> &bufOut, RingBuffer<QImage> &bufIn)
+VideoPlayer::VideoPlayer(RingBuffer<QImage> *bufOut, RingBuffer<QImage> *bufIn)
 {
     f_stop = true;
-    *bufferIn = bufOut;
-    *bufferOut = bufIn;
+    bufferIn = bufOut;
+    bufferOut = bufIn;
 }
 
 VideoPlayer::~VideoPlayer()
 {
-    delete bufferIn;
-    delete bufferOut;
+
 }
 
-void VideoPlayer::stop()
+void VideoPlayer::setStop(bool value)
 {
-    f_stop = true;
+    f_stop = value;
 }
 
 /*
@@ -27,8 +26,18 @@ void VideoPlayer::process()
     while(!f_stop)
     {
         QImage img;
-        bufferIn->popElement(img);
-        emit processedImage(img);
+        QImage img2;
+        img = bufferIn->popElement(img);
+        img2 = bufferIn->popElement(img2);
+        if (img.isNull())
+        {
+            qDebug() << "buffer empty..sleep";
+            QThread::msleep(500);
+        }
+        else
+        {
+            emit processedImage(img);
+        }
     }
     emit finished();
 }

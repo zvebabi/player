@@ -4,6 +4,7 @@
 #include <QObject>
 #include <QImage>
 #include <QDebug>
+#include <QThread>
 #include <ringbuffer.h>
 
 class VideoPlayer : public QObject
@@ -13,13 +14,13 @@ class VideoPlayer : public QObject
     RingBuffer<QImage>* bufferIn; //for inner video
 
 public:
-    explicit VideoPlayer(RingBuffer<QImage> &bufOut, RingBuffer<QImage> &bufIn);
+    explicit VideoPlayer(RingBuffer<QImage> *bufOut, RingBuffer<QImage> *bufIn);
     virtual ~VideoPlayer();
+    void setStop(bool value);
 signals:
     void processedImage(QImage img);
     void finished();
 public slots:
-    void stop();
     void process(); //concat 2 video frame and show
 };
 
