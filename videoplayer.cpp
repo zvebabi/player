@@ -3,8 +3,8 @@
 VideoPlayer::VideoPlayer(RingBuffer<QImage> *bufOut, RingBuffer<QImage> *bufIn)
 {
     f_stop = true;
-    bufferIn = bufOut;
-    bufferOut = bufIn;
+    bufferIn = bufIn;
+    bufferOut = bufOut;
 }
 
 VideoPlayer::~VideoPlayer()
@@ -23,14 +23,18 @@ void VideoPlayer::setStop(bool value)
 void VideoPlayer::process()
 {
     qDebug() << "player_process..";
-    QThread::msleep(200); //pause before buffer will init
+    QThread::msleep(400); //pause before buffer will init
     QImage img;
     QImage img2;
     while(!f_stop)
     {
         timer.start();
-        img = bufferIn->popElement(img);
-        img2 = bufferOut->popElement(img2);
+        if (!bufferOut->popElement(img)
+            || !bufferIn->popElement(img2))
+        {
+            QThread::msleep(5);
+            continue;
+        }
 
         //make frame in frame
         img2 = img2.scaled(img.width()/2,img.height()/2,
@@ -44,10 +48,10 @@ void VideoPlayer::process()
         //send frame to screen
         if (!img.isNull())
             emit processedImage(img);
-        else
-            QThread::msleep(5);
-        int delay = 1000/fpsOut-timer.elapsed();
-        QThread::msleep(delay>0 ? delay : 0 ); //fps delay
+
+        //dynamically fps delay
+        int delay = 1000/fpsOut-timer.elapsed()-10; //
+        QThread::msleep(delay > 0 ? delay : 0 );
     }
 
 

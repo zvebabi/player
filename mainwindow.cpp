@@ -5,6 +5,7 @@ MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
+    this->setWindowFlags(Qt::Window | Qt::WindowTitleHint | Qt::CustomizeWindowHint );
     bufferOuter = new RingBuffer<QImage>(BUFFER_SIZE);
     bufferInner = new RingBuffer<QImage>(BUFFER_SIZE);
     SlicerOuter = new Slicer(bufferOuter);
@@ -56,9 +57,9 @@ MainWindow::~MainWindow()
 
 void MainWindow::updatePlayerUI(QImage img)
 {
+    timer.start();
     if (!img.isNull())
         {
-//            qDebug() << "take a frame";
             ui->label->setAlignment(Qt::AlignCenter);
             ui->label->setPixmap(QPixmap::fromImage(img).scaled(ui->label->size(),
                                                Qt::KeepAspectRatio, Qt::FastTransformation));
@@ -108,8 +109,8 @@ void MainWindow::on_btnPlayVideo_clicked()
         QMessageBox msgBox;
         msgBox.setText("Video not loaded!");
         msgBox.exec();
-        qDebug() << "video not loaded";
     }
+    ui->btnPlayVideo->setDisabled(true);
 }
 
 void MainWindow::on_btnStopVideo_clicked()
@@ -118,4 +119,6 @@ void MainWindow::on_btnStopVideo_clicked()
     SlicerOuter->setStop(true);
     SlicerInner->setStop(true);
     myPlayer->setStop(true);
+    //close mainwindow
+    this->close();
 }

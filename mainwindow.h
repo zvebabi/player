@@ -6,6 +6,7 @@
 #include <QMessageBox>
 #include <QThread>
 #include <QDebug>
+#include <QTime>
 #include <string>
 #include <opencv2/opencv.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
@@ -15,7 +16,7 @@
 #include <slicer.h>
 
 
-static const int BUFFER_SIZE = 300;
+static const int BUFFER_SIZE = 300; //number of frame
 
 
 namespace Ui {
@@ -49,6 +50,7 @@ private:
     QThread *thread1;
     QThread *thread2;
     QThread *thread3;
+    QTime timer;
 };
 
 #endif // MAINWINDOW_H

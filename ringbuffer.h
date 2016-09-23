@@ -22,7 +22,7 @@ public:
     explicit RingBuffer(int sz);
     ~RingBuffer();
     bool insertElement(const T &newElem);
-    T& popElement(T &elem);
+    bool popElement(T &elem);
 
 };
 
@@ -60,17 +60,18 @@ bool RingBuffer<T>::insertElement(const T &newElem)
 }
 
 template <typename T>
-T& RingBuffer<T>::popElement(T &elem)
+bool RingBuffer<T>::popElement(T &elem)
 {
     QMutexLocker locker(mutex);
     Q_UNUSED(locker)
     if (currentElement == -1) {
-        return elem;
+        return false;
     }
     --currentElement;
     elem = buffer->front();
     buffer->pop_front();
-    return elem;
+    return true;
 }
+
 
 #endif // RINGBUFFER_H
