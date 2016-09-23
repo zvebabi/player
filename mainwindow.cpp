@@ -48,18 +48,17 @@ MainWindow::MainWindow(QWidget *parent) :
 
 MainWindow::~MainWindow()
 {
+    qDebug() << "deleted mainwindow";
     delete ui;
-    delete SlicerOuter;
-    delete SlicerInner;
     delete bufferOuter;
     delete bufferInner;
-    delete myPlayer;
 }
 
 void MainWindow::updatePlayerUI(QImage img)
 {
     if (!img.isNull())
         {
+//            qDebug() << "take a frame";
             ui->label->setAlignment(Qt::AlignCenter);
             ui->label->setPixmap(QPixmap::fromImage(img).scaled(ui->label->size(),
                                                Qt::KeepAspectRatio, Qt::FastTransformation));
@@ -69,12 +68,20 @@ void MainWindow::updatePlayerUI(QImage img)
 void MainWindow::on_btnLoadVideo1_clicked()
 {
     QString str = QFileDialog::getOpenFileName(0, "Open File 1");
+    //say frameRate to player;
+    cv::VideoCapture capture(str.toUtf8().data());
+    if (capture.isOpened())
+        myPlayer->setFPSOut((int)capture.get(CV_CAP_PROP_FPS));
     emit loadVideoOuter(str);
 }
 
 void MainWindow::on_btnLoadVideo2_clicked()
 {
     QString str = QFileDialog::getOpenFileName(0, "Open File 2");
+    //say frameRate to player;
+    cv::VideoCapture capture(str.toUtf8().data());
+    if (capture.isOpened())
+        myPlayer->setFPSIn((int)capture.get(CV_CAP_PROP_FPS));
     emit loadVideoInner(str);
 }
 
@@ -93,8 +100,8 @@ void MainWindow::on_btnPlayVideo_clicked()
         myPlayer->moveToThread(thread3);
         //start threads
         thread1->start();
-       // thread2->start();
-        //thread3->start();
+        thread2->start();
+        thread3->start();
     }
     else
     {
@@ -111,7 +118,4 @@ void MainWindow::on_btnStopVideo_clicked()
     SlicerOuter->setStop(true);
     SlicerInner->setStop(true);
     myPlayer->setStop(true);
-    thread1->exit();
-    thread2->exit();
-    thread3->exit();
 }

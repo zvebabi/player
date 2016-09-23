@@ -7,11 +7,15 @@
 #include <QThread>
 #include <QDebug>
 #include <string>
+#include <opencv2/opencv.hpp>
+#include <opencv2/imgproc/imgproc.hpp>
+#include <opencv2/video.hpp>
 #include <ringbuffer.h>
 #include <videoplayer.h>
 #include <slicer.h>
 
-static const int BUFFER_SIZE = 5;
+
+static const int BUFFER_SIZE = 300;
 
 
 namespace Ui {

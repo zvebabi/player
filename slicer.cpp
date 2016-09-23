@@ -8,9 +8,7 @@ Slicer::Slicer(RingBuffer<QImage>* buf)
 
 Slicer::~Slicer()
 {
-    capture->release();
-    delete capture;
-    delete img;
+    qDebug() << "slicer end";
 }
 
 bool Slicer::isVideoLoaded()
@@ -56,16 +54,22 @@ void Slicer::process()
                 img = new QImage((const unsigned char*)(frame.data),
                                      frame.cols,frame.rows,QImage::Format_Indexed8);
             }
-            qDebug() << "bufferingFrame";
+//            qDebug() << "bufferingFrame" << img;
             notFull = buffer->insertElement(*img);
         }
         else
         {
-            qDebug() << "buffer_full";
-            QThread::msleep(500);
+//            qDebug() << "buffer_full" << img;
+            QThread::msleep(10);
             notFull = buffer->insertElement(*img);
         }
     }
+
+    //Clean memory
+    capture->release();
+    delete capture;
+    delete img;
+
     emit finished();
 }
 

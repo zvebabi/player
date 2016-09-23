@@ -39,8 +39,8 @@ RingBuffer<T>::RingBuffer(int sz)
 template <typename T>
 RingBuffer<T>::~RingBuffer()
 {
+    qDebug() << "deleted buffer";
     buffer->clear();
-    qDebug() << "deleted";
     delete buffer;
     delete mutex;
 }
