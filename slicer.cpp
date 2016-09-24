@@ -9,6 +9,10 @@ Slicer::Slicer(RingBuffer<QImage>* buf)
 Slicer::~Slicer()
 {
     qDebug() << "slicer end";
+    //Clean memory
+    capture->release();
+    delete capture;
+    delete img;
 }
 
 bool Slicer::isVideoLoaded()
@@ -26,6 +30,7 @@ void Slicer::loadVideo(QString path)
     capture = new cv::VideoCapture(path.toUtf8().data());
     if (capture->isOpened()) {
         frameRate = (int)capture->get(CV_CAP_PROP_FPS);
+        pathToVideo = path; //save video file
         f_loadSuccessful = true;
     }
     else {
@@ -42,7 +47,8 @@ void Slicer::process()
         {
             if (!capture->read(frame))
             {
-                f_stop = true;
+                loadVideo(pathToVideo);  // reload video while EOF
+                continue;
             }
             if (frame.channels()== 3){
                 cv::cvtColor(frame, RGBframe, CV_BGR2RGB);
@@ -54,21 +60,16 @@ void Slicer::process()
                 img = new QImage((const unsigned char*)(frame.data),
                                      frame.cols,frame.rows,QImage::Format_Indexed8);
             }
-//            qDebug() << "bufferingFrame" << img;
             notFull = buffer->insertElement(*img);
+            QThread::msleep(1);
         }
         else
         {
-//            qDebug() << "buffer_full" << img;
-            QThread::msleep(10);
+            QThread::msleep(20);
             notFull = buffer->insertElement(*img);
         }
     }
 
-    //Clean memory
-    capture->release();
-    delete capture;
-    delete img;
 
     emit finished();
 }

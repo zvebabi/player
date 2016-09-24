@@ -17,6 +17,7 @@ class Slicer : public QObject
 {   Q_OBJECT
     bool f_stop;
     bool f_loadSuccessful;
+    QString pathToVideo;
     QMutex mutex;
     cv::VideoCapture *capture;
     int frameRate;

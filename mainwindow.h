@@ -16,7 +16,7 @@
 #include <slicer.h>
 
 
-static const int BUFFER_SIZE = 300; //number of frame
+static const int BUFFER_SIZE = 50; //number of frame
 
 
 namespace Ui {

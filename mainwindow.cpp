@@ -53,6 +53,9 @@ MainWindow::~MainWindow()
     delete ui;
     delete bufferOuter;
     delete bufferInner;
+//    delete SlicerInner;
+//    delete SlicerOuter;
+//    delete myPlayer;
 }
 
 void MainWindow::updatePlayerUI(QImage img)
@@ -120,5 +123,6 @@ void MainWindow::on_btnStopVideo_clicked()
     SlicerInner->setStop(true);
     myPlayer->setStop(true);
     //close mainwindow
+    QThread::msleep(500);
     this->close();
 }

@@ -32,7 +32,7 @@ void VideoPlayer::process()
         if (!bufferOut->popElement(img)
             || !bufferIn->popElement(img2))
         {
-            QThread::msleep(5);
+            QThread::msleep(1);
             continue;
         }
 
@@ -50,7 +50,7 @@ void VideoPlayer::process()
             emit processedImage(img);
 
         //dynamically fps delay
-        int delay = 1000/fpsOut-timer.elapsed()-10; //
+        int delay = 1000/fpsOut-timer.elapsed(); //
         QThread::msleep(delay > 0 ? delay : 0 );
     }
 
