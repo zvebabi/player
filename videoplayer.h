@@ -7,6 +7,7 @@
 #include <QThread>
 #include <QTime>
 #include <QPainter>
+#include <algorithm>
 #include <ringbuffer.h>
 
 class VideoPlayer : public QObject

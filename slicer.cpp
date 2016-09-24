@@ -9,10 +9,6 @@ Slicer::Slicer(RingBuffer<QImage>* buf)
 Slicer::~Slicer()
 {
     qDebug() << "slicer end";
-    //Clean memory
-    capture->release();
-    delete capture;
-    delete img;
 }
 
 bool Slicer::isVideoLoaded()
@@ -70,6 +66,10 @@ void Slicer::process()
         }
     }
 
+    //Clean memory
+    capture->release();
+    delete capture;
+    delete img;
 
     emit finished();
 }

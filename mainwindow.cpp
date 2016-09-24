@@ -31,13 +31,16 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(thread2, SIGNAL(started()), SlicerInner, SLOT(process()));
     connect(thread3, SIGNAL(started()), myPlayer, SLOT(process()));
 
-    // delete worker after end of process
+    // stop threads
     connect(SlicerOuter, SIGNAL(finished()), thread1, SLOT(quit()));
-    connect(SlicerOuter, SIGNAL(finished()), SlicerOuter, SLOT(deleteLater()));
     connect(SlicerInner, SIGNAL(finished()), thread2, SLOT(quit()));
-    connect(SlicerInner, SIGNAL(finished()), SlicerInner, SLOT(deleteLater()));
     connect(myPlayer, SIGNAL(finished()), thread3, SLOT(quit()));
-    connect(myPlayer, SIGNAL(finished()), myPlayer, SLOT(deleteLater()));
+
+//delete worker after end of process
+    //** realised in destructor of mainwindow
+//    connect(SlicerOuter, SIGNAL(finished()), SlicerOuter, SLOT(deleteLater()));
+//    connect(SlicerInner, SIGNAL(finished()), SlicerInner, SLOT(deleteLater()));
+//    connect(myPlayer, SIGNAL(finished()), myPlayer, SLOT(deleteLater()));
 
     // delete threads
     connect(thread1, SIGNAL(finished()), thread1, SLOT(deleteLater()));
@@ -49,13 +52,13 @@ MainWindow::MainWindow(QWidget *parent) :
 
 MainWindow::~MainWindow()
 {
-    qDebug() << "deleted mainwindow";
     delete ui;
     delete bufferOuter;
     delete bufferInner;
-//    delete SlicerInner;
-//    delete SlicerOuter;
-//    delete myPlayer;
+    delete SlicerInner;
+    delete SlicerOuter;
+    delete myPlayer;
+    qDebug() << "mainwindow deleted";
 }
 
 void MainWindow::updatePlayerUI(QImage img)
@@ -122,6 +125,7 @@ void MainWindow::on_btnStopVideo_clicked()
     SlicerOuter->setStop(true);
     SlicerInner->setStop(true);
     myPlayer->setStop(true);
+
     //close mainwindow
     QThread::msleep(500);
     this->close();
