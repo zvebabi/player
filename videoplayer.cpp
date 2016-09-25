@@ -1,6 +1,6 @@
 #include "videoplayer.h"
 
-VideoPlayer::VideoPlayer(RingBuffer<QImage> *bufOut, RingBuffer<QImage> *bufIn)
+VideoPlayer::VideoPlayer(RingBuffer<std::shared_ptr<QImage>> *bufOut, RingBuffer<std::shared_ptr<QImage>> *bufIn)
 {
     f_stop = true;
     bufferIn = bufIn;
@@ -23,7 +23,6 @@ void VideoPlayer::setStop(bool value)
 void VideoPlayer::process()
 {
     qDebug() << "player_process..";
-    QThread::msleep(400); //delayed start for buffer initialisation
 
     //sync different fps
     int maxFps = std::max(fpsOut,fpsIn);
@@ -32,8 +31,13 @@ void VideoPlayer::process()
     int framecounter = maxFps; // count from maxfps to zero
     int i=ratio, k=modulo; //frame repeate counters
     bool oneMoreTimes = false; // for modulo frame
-    QImage img;
-    QImage img2;
+    std::shared_ptr<QImage> img;
+    std::shared_ptr<QImage> img2;
+
+    //load first frames
+    while (!bufferOut->popElement(img)) {QThread::msleep(2);}
+    while (!bufferIn->popElement(img2)) {QThread::msleep(2);}
+
     while(!f_stop)
     {
         timer.start();
@@ -89,17 +93,17 @@ void VideoPlayer::process()
             k=modulo;
         }
         //make frame in frame
-        img2 = img2.scaled(img.width()/2,img.height()/2,
+        *img2 = img2->scaled(img->width()/2,img->height()/2,
                     Qt::KeepAspectRatio, Qt::FastTransformation);
-        int dx = (img.width() - img2.width())/2;
-        int dy = (img.height() - img2.height())/2;
-        QPainter p(&img);
-        p.drawImage(dx, dy, img2);
+        int dx = (img->width() - img2->width())/2;
+        int dy = (img->height() - img2->height())/2;
+        QPainter p(img.get());
+        p.drawImage(dx, dy, *img2);
         p.end();
 
         //send frame to screen
-        if (!img.isNull())
-            emit processedImage(img);
+        if (!img->isNull())
+            emit processedImage(*img);
 
         //dynamically fps delay
         int delay = 1000/maxFps-timer.elapsed(); //

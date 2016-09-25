@@ -1,6 +1,6 @@
 #include "slicer.h"
 
-Slicer::Slicer(RingBuffer<QImage>* buf)
+Slicer::Slicer(RingBuffer<std::shared_ptr<QImage>>* buf)
 {
     f_stop = true;
     buffer = buf;
@@ -43,33 +43,35 @@ void Slicer::process()
         {
             if (!capture->read(frame))
             {
+                capture->release();
+                delete capture;
                 loadVideo(pathToVideo);  // reload video while EOF
                 continue;
             }
             if (frame.channels()== 3){
                 cv::cvtColor(frame, RGBframe, CV_BGR2RGB);
-                img = new QImage((const unsigned char*)(RGBframe.data),
-                                  RGBframe.cols,RGBframe.rows,QImage::Format_RGB888);
+                img = std::make_shared<QImage>(QImage((const unsigned char*)(RGBframe.data),
+                                  RGBframe.cols,RGBframe.rows,QImage::Format_RGB888));
             }
             else
             {
-                img = new QImage((const unsigned char*)(frame.data),
-                                     frame.cols,frame.rows,QImage::Format_Indexed8);
+                img = std::make_shared<QImage>(QImage((const unsigned char*)(frame.data),
+                                     frame.cols,frame.rows,QImage::Format_Indexed8));
             }
-            notFull = buffer->insertElement(*img);
+            notFull = buffer->insertElement(img);
             QThread::msleep(1);
         }
         else
         {
             QThread::msleep(20);
-            notFull = buffer->insertElement(*img);
+            notFull = buffer->insertElement(img);
         }
     }
 
     //Clean memory
     capture->release();
     delete capture;
-    delete img;
+    //delete img;
 
     emit finished();
 }

@@ -8,6 +8,7 @@
 #include <QDebug>
 #include <QString>
 #include <string>
+#include <memory>
 #include <opencv2/opencv.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/video.hpp>
@@ -21,13 +22,13 @@ class Slicer : public QObject
     QMutex mutex;
     cv::VideoCapture *capture;
     int frameRate;
-    QImage *img;
+    std::shared_ptr<QImage> img;
     cv::Mat frame;
     cv::Mat RGBframe;
-    RingBuffer<QImage>* buffer;
+    RingBuffer<std::shared_ptr<QImage>>* buffer;
 
 public:
-    explicit Slicer(RingBuffer<QImage> *buf);
+    explicit Slicer(RingBuffer<std::shared_ptr<QImage>> *buf);
     virtual ~Slicer();
     bool isVideoLoaded();
     void setStop(bool value);

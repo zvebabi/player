@@ -8,6 +8,7 @@
 #include <QDebug>
 #include <QTime>
 #include <string>
+#include <memory>
 #include <opencv2/opencv.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/video.hpp>
@@ -42,8 +43,8 @@ private slots:
     void on_btnStopVideo_clicked();
 private:
     Ui::MainWindow *ui;
-    RingBuffer<QImage> *bufferOuter;
-    RingBuffer<QImage> *bufferInner;
+    RingBuffer<std::shared_ptr<QImage>> *bufferOuter;
+    RingBuffer<std::shared_ptr<QImage>> *bufferInner;
     Slicer *SlicerOuter;
     Slicer *SlicerInner;
     VideoPlayer *myPlayer;

@@ -8,6 +8,7 @@
 #include <QTime>
 #include <QPainter>
 #include <algorithm>
+#include <memory>
 #include <ringbuffer.h>
 
 class VideoPlayer : public QObject
@@ -16,11 +17,11 @@ class VideoPlayer : public QObject
     int fpsOut;
     int fpsIn;
     QTime timer;
-    RingBuffer<QImage>* bufferOut; //for outer video
-    RingBuffer<QImage>* bufferIn; //for inner video
+    RingBuffer<std::shared_ptr<QImage>>* bufferOut; //for outer video
+    RingBuffer<std::shared_ptr<QImage>>* bufferIn; //for inner video
 
 public:
-    explicit VideoPlayer(RingBuffer<QImage> *bufOut, RingBuffer<QImage> *bufIn);
+    explicit VideoPlayer(RingBuffer<std::shared_ptr<QImage> > *bufOut, RingBuffer<std::shared_ptr<QImage> > *bufIn);
     virtual ~VideoPlayer();
     void setStop(bool value);
     void setFPSOut(int n) {fpsOut = n;}

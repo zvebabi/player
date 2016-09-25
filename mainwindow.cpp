@@ -6,8 +6,8 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     this->setWindowFlags(Qt::Window | Qt::WindowTitleHint | Qt::CustomizeWindowHint );
-    bufferOuter = new RingBuffer<QImage>(BUFFER_SIZE);
-    bufferInner = new RingBuffer<QImage>(BUFFER_SIZE);
+    bufferOuter = new RingBuffer<std::shared_ptr<QImage>>(BUFFER_SIZE);
+    bufferInner = new RingBuffer<std::shared_ptr<QImage>>(BUFFER_SIZE);
     SlicerOuter = new Slicer(bufferOuter);
     SlicerInner = new Slicer(bufferInner);
     myPlayer = new VideoPlayer(bufferOuter, bufferInner);
